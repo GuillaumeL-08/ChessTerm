@@ -13,7 +13,8 @@ class Grille:
         for i in range(len(self.grille[6])):
             self.grille[6][i] = Pion([1,i], WHITE)
 
-            self.grille[1][1] = Pion([6,1], WHITE)
+        self.grille[4][1] = Pion([4,1], WHITE)
+        self.grille[5][2] = Pion([4,1], BLACK)
 
     def display_grille(self):
         for row in self.grille:
@@ -28,12 +29,23 @@ class Grille:
             self.turn = WHITE
         self.coup_possible = {}
 
-    def set_move(self):
+    def get_move(self):
         for row in self.grille:
             for elem in row:
                 if elem.color == self.turn:
-                    self.coup_possible[elem.get_coor()] = elem.coup_possible()
+                    coups = elem.coup_possible()
+                    for coup in coups:
+                        if "x" in coup:
+                            pass
+                        else:
+                            if type(self.grille[conv_case_chiffre(coup[1])][conv_case_lettre(coup[0])]) != Piece:
+                                coups.remove(coup)
+                    self.coup_possible[elem.get_coor()] = coups
         print(self.coup_possible)
+
+    def set_move(self, move):
+        pass
+
 
 class Piece:
     def __init__(self, case, color=None, icon = "."):
@@ -110,4 +122,5 @@ def set_coor(lettre, chiffre):
 
 Plateau = Grille()
 
-Plateau.set_move()
+Plateau.display_grille()
+Plateau.get_move()
