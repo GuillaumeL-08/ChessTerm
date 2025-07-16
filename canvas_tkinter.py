@@ -18,11 +18,13 @@ mainframe = ttk.Frame(root)
 mainframe.grid()
 
 canvas = Canvas(mainframe, bg="black", width=board_width, height=board_height)
-canvas.pack()
+canvas.grid(row=1, column=1, columnspan=8, rowspan=8)
 
 for i in range(8):
-    mainframe.rowconfigure(i, minsize=128)
-    mainframe.columnconfigure(i, minsize=128)
+    label = Label(mainframe, text=chr(ord('A') + i), bg='white')
+    label.grid(row=0, column=i + 1, sticky=(S))
+    label = Label(mainframe, text=chr(ord('1') + i), bg='white')
+    label.grid(row=i + 1, column=0, sticky=(E))
 
 # Init chess board
 bg_img = Image.open('img/plateau.png')
