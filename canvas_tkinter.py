@@ -90,6 +90,14 @@ def update_board(board):
             display_piece(piece, col, row)
             col += 1
 
+def update_history_white(entry):
+    history_white.append(entry)
+    history_white_var.set(history_white)
+
+def update_history_black(entry):
+    history_black.append(entry)
+    history_black_var.set(history_black)
+
 # def delete_piece(piece):
 #     canvas.delete(piece)
 
