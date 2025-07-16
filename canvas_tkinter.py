@@ -10,22 +10,19 @@ board_height = 1024
 root = Tk()
 root.title("Echecs")
 
-img_black_dict = {
-    '': ImageTk.PhotoImage(Image.open('img/pion_noir.png')),
-    'F': ImageTk.PhotoImage(Image.open('img/fou_noir.png')),
-    'D': ImageTk.PhotoImage(Image.open('img/reine_noire.png')),
-    'R': ImageTk.PhotoImage(Image.open('img/roi_noir.png')),
-    'C': ImageTk.PhotoImage(Image.open('img/cavalier_noir.png')),
-    'T': ImageTk.PhotoImage(Image.open('img/tour_noire.png')),
-}
-
-img_white_dict = {
-    '': ImageTk.PhotoImage(Image.open('img/pion_blanc.png')),
-    'F': ImageTk.PhotoImage(Image.open('img/fou_blanc.png')),
-    'D': ImageTk.PhotoImage(Image.open('img/reine_blanche.png')),
-    'R': ImageTk.PhotoImage(Image.open('img/roi_blanc.png')),
-    'C': ImageTk.PhotoImage(Image.open('img/cavalier_blanc.png')),
-    'T': ImageTk.PhotoImage(Image.open('img/tour_blanche.png')),
+img_dict = {
+    'p': ImageTk.PhotoImage(Image.open('img/pion_noir.png').resize((100, 100))),
+    'b': ImageTk.PhotoImage(Image.open('img/fou_noir.png').resize((100, 100))),
+    'q': ImageTk.PhotoImage(Image.open('img/reine_noire.png').resize((100, 100))),
+    'k': ImageTk.PhotoImage(Image.open('img/roi_noir.png').resize((100, 100))),
+    'n': ImageTk.PhotoImage(Image.open('img/cavalier_noir.png').resize((100, 100))),
+    'r': ImageTk.PhotoImage(Image.open('img/tour_noire.png').resize((100, 100))),
+    'P': ImageTk.PhotoImage(Image.open('img/pion_blanc.png').resize((100, 100))),
+    'B': ImageTk.PhotoImage(Image.open('img/fou_blanc.png').resize((100, 100))),
+    'Q': ImageTk.PhotoImage(Image.open('img/reine_blanche.png').resize((100, 100))),
+    'K': ImageTk.PhotoImage(Image.open('img/roi_blanc.png').resize((100, 100))),
+    'N': ImageTk.PhotoImage(Image.open('img/cavalier_blanc.png').resize((100, 100))),
+    'R': ImageTk.PhotoImage(Image.open('img/tour_blanche.png').resize((100, 100))),
 }
 
 # takes a col number as parameter (between 0 and 7). Returns the matching x coordinate (center of the cell) in the canvas
@@ -69,24 +66,33 @@ bg_img = Image.open('img/plateau.png')
 bg_photo = ImageTk.PhotoImage(bg_img)
 canvas.create_image(board_width / 2, board_height / 2, image=bg_photo)
 
-# Display some pieces
-fou1 = canvas.create_image(get_x_from_col(0), get_y_from_row(0), image=img_black_dict['F'])
-fou2 = canvas.create_image(get_x_from_col(2), get_y_from_row(3), image=img_black_dict['F'])
-fou3 = canvas.create_image(get_x_from_col(4), get_y_from_row(5), image=img_black_dict['F'])
-fou4 = canvas.create_image(get_x_from_col(7), get_y_from_row(7), image=img_black_dict['F'])
+pieces_list = []
 
-def deletePiece(piece):
-    canvas.delete(piece)
+# Display one piece
+def display_piece(piece, col, row):
+    pieces_list.append(canvas.create_image(get_x_from_col(col), get_y_from_row(row), image=img_dict[piece]))
 
-def movePiece(piece, col, row):
-    deletePiece(piece)
-    return canvas.create_image(get_x_from_col(col), get_y_from_row(row), image=img_black_dict['F'])
+# Display all the pieces on the chessboard
+def update_board(board):
+    global canvas
+    global pieces_list
+    for piece in pieces_list:
+        canvas.delete(piece)
+    row = 0
+    col = 0
+    for piece in board.board_fen():
+        if '1' <= piece <= '8':
+            col += ord(piece) - ord('0')
+        elif piece == '/':
+            col = 0
+            row += 1
+        else:
+            display_piece(piece, col, row)
+            col += 1
 
-def randomMove():
-    global fou2
-    fou2 = movePiece(fou2, randint(0, 7), randint(0, 7))
-    root.after(2000, randomMove)
+# def delete_piece(piece):
+#     canvas.delete(piece)
 
-# run main frame loop
-root.after(2000, randomMove)
-root.mainloop()
+# def move_piece(piece, col, row):
+#     delete_piece(piece)
+#     return canvas.create_image(get_x_from_col(col), get_y_from_row(row), image=img_black_dict['b'])
