@@ -1,5 +1,6 @@
 class Grille:
     def __init__(self):
+        self.historique = []
         self.tour = "WHITE"
         self.grille = [[Piece([i,j]) for j in range(8)] for i in range(8)]
         for i in range(len(self.grille[1])):
@@ -8,7 +9,6 @@ class Grille:
         for i in range(len(self.grille[6])):
             self.grille[6][i] = Pion([1,i], "WHITE")
 
-        self.grille[4][4] = Pion([4,4], "WHITE")
 
     def display_grille(self):
         for row in self.grille:
@@ -23,6 +23,7 @@ class Grille:
             self.tour = "WHITE"
 
     def grille_mouve(self, mouv):
+        self.historique.append(mouv)
         if mouv[0] == "T":
             pass
         elif mouv[0] == "C":
@@ -36,16 +37,30 @@ class Grille:
         else:
             if self.tour == "WHITE":
                 if mouv[1] == "x":
-                    pass
+                    lettre_case_init = conv_case_lettre(mouv[0])
+                    lettre_case_arrive = conv_case_lettre(mouv[2])
+                    chiffre_case = conv_case_chiffre(mouv[-1])
+                    if type(self.grille[chiffre_case-1][lettre_case_init]) == Pion:
+                        pass
+                    else:
+                        print("Error")
                 else:
-                    if (0 < (conv_case_chiffre(mouv[-1])+1) < 8) and type(self.grille[conv_case_chiffre(mouv[-1])][conv_case_lettre(mouv[0])]) == Piece:
-                        if type(self.grille[conv_case_chiffre(mouv[-1])+1][conv_case_lettre(mouv[0])]) == Pion:
-                            if self.grille[conv_case_chiffre(mouv[-1])+1][conv_case_lettre(mouv[0])].autorise_moove(mouv):
-                                pass
-                        elif 0 < (conv_case_chiffre(mouv[-1])+2) < 8:
-                            if type(self.grille[conv_case_chiffre(mouv[-1])+2][conv_case_lettre(mouv[0])]) == Pion:
-                                if self.grille[conv_case_chiffre(mouv[-1])+2][conv_case_lettre(mouv[0])].autorise_moove(mouv):
-                                    pass
+                    chiffre_case = conv_case_chiffre(mouv[-1])
+                    lettre_case = conv_case_lettre(mouv[0])
+                    if test_case(chiffre_case+1) and type(self.grille[chiffre_case][lettre_case]) == Piece:
+                        if type(self.grille[chiffre_case+1][lettre_case]) == Pion:
+                            self.grille[chiffre_case+1][lettre_case].has_move = True
+                            self.grille[chiffre_case][lettre_case] = self.grille[chiffre_case+1][lettre_case]
+                            self.grille[chiffre_case][lettre_case].set_moove(mouv)
+                            self.grille[chiffre_case+1][lettre_case] = Piece([chiffre_case+1,lettre_case])
+                            self.grille[chiffre_case][lettre_case].get_Pion()
+                        elif test_case(chiffre_case+2) and type(self.grille[chiffre_case][lettre_case]) == Piece:
+                            if type(self.grille[chiffre_case+2][lettre_case]) == Pion:
+                                if self.grille[chiffre_case+2][lettre_case].autorise_moove(mouv):
+                                    self.grille[chiffre_case][lettre_case] = self.grille[chiffre_case+2][lettre_case]
+                                    self.grille[chiffre_case][lettre_case].set_moove(mouv)
+                                    self.grille[chiffre_case+2][lettre_case] = Piece([chiffre_case+2, lettre_case])
+                                    self.grille[chiffre_case][lettre_case].get_Pion()
                         else:
                             print("Erreur")
                     else:
@@ -68,13 +83,17 @@ class Pion(Piece):
         super().__init__(case, color=color, icon = icon)
 
     def autorise_moove(self, mouv):
-        if self.case[0]+3 == conv_case_chiffre(mouv[-1]) and not self.has_move:
+        if self.case[0]+3 == conv_case_lettre(mouv[0]) and not self.has_move:
             self.has_move = True
-            return True
-        elif self.case[0]+2 == conv_case_chiffre(mouv[-1]):
             return True
         else:
             return False
+        
+    def set_moove(self, mouv):
+        self.case = [conv_case_lettre(mouv[-2]), conv_case_chiffre(mouv[-1])]
+
+    def get_Pion(self):
+        print("Le pion se trouve en", conv_chiffre_lettre(self.case[0]), conv_chiffre_case(self.case[1]))
 
 def conv_case_lettre(lettre):
     return ord(lettre) - 97
@@ -82,9 +101,19 @@ def conv_case_lettre(lettre):
 def conv_case_chiffre(chiffre):
     return 8-int(chiffre)
 
+def conv_chiffre_lettre(case):
+    return chr(case + 97)
+
+def conv_chiffre_case(case):
+    return 8-case
+
+def test_case(case):
+    return 0 <= case < 8
+
 Plateau = Grille()
 
-
-Plateau.grille_mouve("e4")
+Plateau.display_grille()
 Plateau.grille_mouve("e3")
+Plateau.grille_mouve("e4")
+Plateau.grille_mouve("a4")
 Plateau.display_grille()
